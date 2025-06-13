@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Student Budget Manager</title>
+    <style>
+        :root {
+            --primary: #4A6FA5;
+            --secondary: #6B8CBE;
+            --accent: #FF6B6B;
+            --light: #F0F4F8;
+            --dark: #2E3A4D;
+            --success: #4CAF50;
+            --info: #2196F3;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #F5F7FA;
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        h1, h2, h3 {
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 80px;
+            z-index: 99;
+        }
+        
+        .tab {
+            padding: 12px 10px;
+            cursor: pointer;
+            flex: 1 0 auto;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 60px;
+            user-select: none;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--light);
+            padding-bottom: 8px;
+        }
+        
+        .balance {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--accent);
+        }
+        
+        .chart-container {
+            height: 250px;
+            margin-top: 15px;
+        }
+        
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .calendar th, .calendar td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .calendar th {
+            background-color: var(--light);
+            font-weight: bold;
+        }
+        
+        .calendar td {
+            height: 60px;
+            vertical-align: top;
+        }
+        
+        .calendar .today {
+            background-color: rgba(74, 111, 165, 0.1);
+            border: 2px solid var(--primary);
+        }
+        
+        .calendar-event {
+            font-size: 0.7rem;
+            background-color: var(--info);
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin: 1px 0;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 5px;
+            user-select: none;
+            min-height: 48px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-income {
+            border-left: 4px solid var(--success);
+        }
+        
+        .transaction-expense {
+            border-left: 4px solid var(--accent);
+        }
+        
+        .transaction-amount {
+            font-weight: bold;
+            text-align: right;
+            min-width: 80px;
+        }
+        
+        .progress-bar {
+            height: 15px;
+            background-color: var(--light);
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+        
+        .goal-item {
+            margin-bottom: 15px;
+        }
+        
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .calculator button {
+            padding: 12px;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .calculator-display {
+            grid-column: span 4;
+            background-color: #f8f8f8;
+            padding: 12px;
+            text-align: right;
+            font-size: 1.3rem;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .span-2 {
+            grid-column: span 2;
+        }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            background-color: var(--light);
+        }
+        
+        .percentage {
+            font-size: 0.8rem;
+            color: #777;
+        }
+        
+        .percentage-input {
+            width: 50px;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        
+        .percentage-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .percentage-container label {
+            flex-grow: 1;
+            min-width: 100%;
+        }
+        
+        .remaining-percentage {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .amount-display {
+            margin-left: 8px;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .login-status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: var(--light);
+            font-size: 0.9rem;
+        }
+        
+        .logged-in {
+            background-color: #E8F5E9;
+            color: var(--success);
+        }
+        
+        .logged-out {
+            background-color: #FFEBEE;
+            color: var(--accent);
+        }
+        
+        /* Mobile-specific improvements */
+        @media (max-width: 600px) {
+            .tab {
+                padding: 12px 5px;
+                font-size: 0.8rem;
+            }
+            
+            button {
+                padding: 14px 15px;
+            }
+            
+            input, select {
+                padding: 14px;
+            }
+            
+            .calculator button {
+                padding: 14px;
+            }
+            
+            /* Better touch targets */
+            button, .tab, .calendar td {
+                min-height: 44px;
+            }
+            
+            /* Adjust calendar cell size */
+            .calendar td {
+                height: 50px;
+                padding: 4px;
+            }
+            
+            .calendar-event {
+                font-size: 0.6rem;
+                padding: 1px 2px;
+            }
+        }
+        
+        @media (min-width: 600px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .percentage-container label {
+                min-width: 0;
+            }
+        }
+        
+        /* Google Sign-In button styling */
+        .google-signin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4285F4;
+            color: white;
+            border-radius: 4px;
+            padding: 10px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.25);
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        
+        .google-signin-btn:hover {
+            background-color: #3367D6;
+        }
+        
+        .google-signin-btn img {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            background-color: white;
+            padding: 4px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Student Budget Manager</h1>
+            <p>Track your finances and reach your goals!</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="login-status" class="login-status logged-out">
+            Not signed in (using local storage)
+        </div>
+        
+        <div id="google-signin-container" style="display: none;">
+            <div id="google-signin-btn" class="google-signin-btn" onclick="handleGoogleSignIn()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google logo">
+                Sign in with Google
+            </div>
+            <button id="google-signout-btn" onclick="handleGoogleSignOut()" style="display: none;">Sign Out</button>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('dashboard')">Dashboard</div>
+            <div class="tab" onclick="openTab('calendar')">Calendar</div>
+            <div class="tab" onclick="openTab('budget')">Budget</div>
+            <div class="tab" onclick="openTab('goals')">Goals</div>
+            <div class="tab" onclick="openTab('history')">History</div>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <h3>Current Balance</h3>
+                    <div class="balance" id="current-balance">₱0.00</div>
+                    <div>Available to spend</div>
+                </div>
+                <div class="card">
+                    <h3>Monthly Summary</h3>
+                    <div>Income: <span id="monthly-income">₱0.00</span></div>
+                    <div>Expenses: <span id="monthly-expenses">₱0.00</span></div>
+                    <div>Savings: <span id="monthly-savings">₱0.00</span></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Recent Transactions</h3>
+                <ul class="transaction-list" id="recent-transactions">
+                    <li>No recent transactions</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>Spending by Category</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Goals Progress</h3>
+                <div id="goals-progress">
+                    <p>No active goals</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar Tab -->
+        <div id="calendar" class="tab-content">
+            <div class="card">
+                <h3>Financial Calendar</h3>
+                <div id="calendar-month" style="text-align: center; margin: 12px 0; font-weight: bold;"></div>
+                <table class="calendar" id="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Sun</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar-body">
+                        <!-- Calendar will be generated here -->
+                    </tbody>
+                </table>
+                <div style="text-align: center; margin-top: 12px;">
+                    <button onclick="prevMonth()" style="width: 30%; display: inline-block;">Previous</button>
+                    <button onclick="goToToday()" style="width: 30%; display: inline-block; margin: 0 5px;">Today</button>
+                    <button onclick="nextMonth()" style="width: 30%; display: inline-block;">Next</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Transactions on <span id="selected-date">Selected Date</span></h3>
+                <ul class="transaction-list" id="date-transactions">
+                    <li>No transactions on this date</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Budget Plan Tab -->
+        <div id="budget" class="tab-content">
+            <div class="card">
+                <h3>Create Budget Plan</h3>
+                <div class="form-group">
+                    <label for="total-budget">Total Budget Amount</label>
+                    <input type="number" id="total-budget" placeholder="0.00" onchange="calculateBudgetDistribution()">
+                </div>
+                
+                <div class="form-group">
+                    <label for="budget-type">Type</label>
+                    <select id="budget-type">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                    </select>
+                </div>
+                
+                <div id="budget-categories-container">
+                    <!-- Categories will be added here -->
+                </div>
+                
+                <div class="form-group">
+                    <button onclick="addBudgetCategory()">Add Category</button>
+                </div>
+                
+                <div class="remaining-percentage" id="remaining-percentage">
+                    Remaining to allocate: 100%
+                </div>
+                
+                <button onclick="saveBudgetPlan()">Save Budget Plan</button>
+            </div>
+            
+            <div class="card">
+                <h3>Your Budget Distribution</h3>
+                <div id="budget-plan">
+                    <p>No budget plan created yet</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Add Transaction</h3>
+                <div class="form-group">
+                    <label for="transaction-amount">Amount</label>
+                    <input type="number" id="transaction-amount" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-category">Category</label>
+                    <select id="transaction-category">
+                        <!-- Categories will be populated from budget items -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transaction-date">Date</label>
+                    <input type="date" id="transaction-date">
+                </div>
+                <div class="form-group">
+                    <label for="transaction-notes">Notes</label>
+                    <input type="text" id="transaction-notes" placeholder="Optional description">
+                </div>
+                <button onclick="addTransaction()">Add Transaction</button>
+            </div>
+            
+            <div class="card">
+                <h3>Budget Calculator</h3>
+                <div class="calculator-display" id="calc-display">0</div>
+                <div class="calculator">
+                    <button onclick="clearCalculator()">C</button>
+                    <button onclick="appendToCalc('(')">(</button>
+                    <button onclick="appendToCalc(')')">)</button>
+                    <button onclick="appendToCalc('/')">/</button>
+                    
+                    <button onclick="appendToCalc('7')">7</button>
+                    <button onclick="appendToCalc('8')">8</button>
+                    <button onclick="appendToCalc('9')">9</button>
+                    <button onclick="appendToCalc('*')">*</button>
+                    
+                    <button onclick="appendToCalc('4')">4</button>
+                    <button onclick="appendToCalc('5')">5</button>
+                    <button onclick="appendToCalc('6')">6</button>
+                    <button onclick="appendToCalc('-')">-</button>
+                    
+                    <button onclick="appendToCalc('1')">1</button>
+                    <button onclick="appendToCalc('2')">2</button>
+                    <button onclick="appendToCalc('3')">3</button>
+                    <button onclick="appendToCalc('+')">+</button>
+                    
+                    <button onclick="appendToCalc('0')" class="span-2">0</button>
+                    <button onclick="appendToCalc('.')">.</button>
+                    <button onclick="calculate()">=</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Financial Goals Tab -->
+        <div id="goals" class="tab-content">
+            <div class="card">
+                <h3>Set Financial Goal</h3>
+                <div class="form-group">
+                    <label for="goal-name">Goal Name</label>
+                    <input type="text" id="goal-name" placeholder="e.g. New Laptop, Vacation">
+                </div>
+                <div class="form-group">
+                    <label for="goal-target">Target Amount</label>
+                    <input type="number" id="goal-target" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="goal-saved">Amount Saved</label>
+                    <input type="number" id="goal-saved" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="goal-deadline">Target Date</label>
+                    <input type="date" id="goal-deadline">
+                </div>
+                <button onclick="addGoal()">Add Goal</button>
+            </div>
+            
+            <div class="card">
+                <h3>Your Financial Goals</h3>
+                <div id="goals-list">
+                    <p>No goals set yet</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="card">
+                <h3>Transaction History</h3>
+                <div class="form-group">
+                    <label for="history-filter">Filter by:</label>
+                    <select id="history-filter" onchange="filterHistory()">
+                        <option value="all">All Transactions</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expenses</option>
+                        <option value="category">By Category</option>
+                        <option value="date">By Date Range</option>
+                    </select>
+                </div>
+                
+                <div id="category-filter-container" style="display: none;">
+                    <label for="history-category">Select Category:</label>
+                    <select id="history-category">
+                        <!-- Categories will be populated -->
+                    </select>
+                </div>
+                
+                <div id="date-filter-container" style="display: none;">
+                    <label for="history-start-date">From:</label>
+                    <input type="date" id="history-start-date">
+                    <label for="history-end-date">To:</label>
+                    <input type="date" id="history-end-date">
+                </div>
+                
+                <ul class="transaction-list" id="transaction-history">
+                    <li>No transactions recorded</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="resetAllData()" style="background-color: #ff4444;">Reset All Data</button>
+            <button onclick="syncWithCloud()" style="background-color: var(--success); margin-top: 10px;">Sync with Google Account</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data storage
+        let budgetData = JSON.parse(localStorage.getItem('budgetData')) || {
+            budgetItems: [],
+            transactions: [],
+            goals: [],
+            categories: [],
+            budgetDistribution: {}
+        };
+        
+        // Chart instances
+        let categoryChart;
+        
+        // Calendar variables
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        // Authentication state
+        let isLoggedIn = false;
+        let userId = '';
+        let userEmail = '';
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            addBudgetCategory(); // Initialize with one category
+            updateDashboard();
+            generateCalendar(currentMonth, currentYear);
+            updateBudgetPlanDisplay();
+            updateGoalsDisplay();
+            updateTransactionHistory();
+            populateCategoryDropdowns();
+            
+            // Initialize date fields with today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('transaction-date').value = today;
+            document.getElementById('goal-deadline').value = today;
+            document.getElementById('history-start-date').value = today;
+            document.getElementById('history-end-date').value = today;
+            
+            // Check for existing authentication state
+            checkAuthState();
+            
+            // Show Google Sign-In button
+            document.getElementById('google-signin-container').style.display = 'block';
+        });
+        
+        // Authentication functions
+        function checkAuthState() {
+            // Check if we have a user ID from the WebView
+            if (typeof Android !== 'undefined' && Android.getUserData) {
+                const userData = Android.getUserData();
+                if (userData) {
+                    try {
+                        const parsedData = JSON.parse(userData);
+                        if (parsedData.userId) {
+                            handleSuccessfulSignIn(parsedData.userId, parsedData.email);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing user data:', e);
+                    }
+                }
+            }
+            
+            updateLoginStatus();
+        }
+        
+        function handleGoogleSignIn() {
+            // This will trigger the native Android sign-in flow
+            if (typeof Android !== 'undefined' && Android.signIn) {
+                Android.signIn();
+            } else {
+                alert('Google Sign-In is not available in this environment');
+            }
+        }
+        
+        function handleGoogleSignOut() {
+            if (typeof Android !== 'undefined' && Android.signOut) {
+                Android.signOut();
+            }
+            handleSignOut();
+        }
+        
+        function handleSuccessfulSignIn(id, email) {
+            isLoggedIn = true;
+            userId = id;
+            userEmail = email;
+            
+            // Save to localStorage
+            localStorage.setItem('googleLoggedIn', 'true');
+            localStorage.setItem('googleUserId', userId);
+            localStorage.setItem('googleUserEmail', userEmail);
+            
+            // Update UI
+            updateLoginStatus();
+            document.getElementById('google-signin-btn').style.display = 'none';
+            document.getElementById('google-signout-btn').style.display = 'block';
+            
+            // Load data from cloud
+            loadFromCloud();
+        }
+        
+        function handleSignOut() {
+            isLoggedIn = false;
+            userId = '';
+            userEmail = '';
+            
+            // Clear from localStorage
+            localStorage.removeItem('googleLoggedIn');
+            localStorage.removeItem('googleUserId');
+            localStorage.removeItem('googleUserEmail');
+            
+            // Update UI
+            updateLoginStatus();
+            document.getElementById('google-signin-btn').style.display = 'block';
+            document.getElementById('google-signout-btn').style.display = 'none';
+        }
+        
+        function updateLoginStatus() {
+            const loginStatus = document.getElementById('login-status');
+            if (isLoggedIn && userId) {
+                loginStatus.textContent = `Signed in as: ${userEmail || userId}`;
+                loginStatus.className = 'login-status logged-in';
+            } else {
+                loginStatus.textContent = 'Not signed in (using local storage)';
+                loginStatus.className = 'login-status logged-out';
+            }
+        }
+        
+        // Tab navigation
+        function openTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            // Update charts when dashboard is opened
+            if (tabId === 'dashboard') {
+                updateCharts();
+            }
+        }
+        
+        // Dashboard functions
+        function updateDashboard() {
+            // Calculate current balance
+            let balance = 0;
+            let income = 0;
+            let expenses = 0;
+            
+            budgetData.transactions.forEach(transaction => {
+                if (transaction.type === 'income') {
+                    balance += parseFloat(transaction.amount);
+                    income += parseFloat(transaction.amount);
+                } else {
+                    balance -= parseFloat(transaction.amount);
+                    expenses += parseFloat(transaction.amount);
+                }
+            });
+            
+            // Update balance display
+            const balanceElement = document.getElementById('current-balance');
+            balanceElement.textContent = `₱${balance.toFixed(2)}`;
+            balanceElement.className = 'balance ' + (balance >= 0 ? 'positive' : 'negative');
+            
+            // Update monthly summary
+            document.getElementById('monthly-income').textContent = `₱${income.toFixed(2)}`;
+            document.getElementById('monthly-expenses').textContent = `₱${expenses.toFixed(2)}`;
+            document.getElementById('monthly-savings').textContent = `₱${(income - expenses).toFixed(2)}`;
+            
+            // Update recent transactions
+            const recentTransactions = document.getElementById('recent-transactions');
+            recentTransactions.innerHTML = '';
+            
+            const sortedTransactions = [...budgetData.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const recent = sortedTransactions.slice(0, 5);
+            
+            if (recent.length === 0) {
+                recentTransactions.innerHTML = '<li>No recent transactions</li>';
+            } else {
+                recent.forEach(transaction => {
+                    const li = document.createElement('li');
+                    li.className = `transaction-item transaction-${transaction.type}`;
+                    
+                    const leftDiv = document.createElement('div');
+                    leftDiv.innerHTML = `<strong>${transaction.category}</strong><br>
+                                        <small>${transaction.date} - ${transaction.notes || ''}</small>`;
+                    
+                    const rightDiv = document.createElement('div');
+                    rightDiv.className = 'transaction-amount';
+                    rightDiv.textContent = `${transaction.type === 'income' ? '+' : '-'}₱${parseFloat(transaction.amount).toFixed(2)}`;
+                    
+                    li.appendChild(leftDiv);
+                    li.appendChild(rightDiv);
+                    recentTransactions.appendChild(li);
+                });
+            }
+            
+            // Update goals progress
+            updateGoalsProgress();
+            
+            // Update charts
+            updateCharts();
+        }
+        
+        function updateCharts() {
+            // Category spending chart
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            
+            // Group transactions by category
+            const categoryTotals = {};
+            budgetData.transactions.forEach(transaction => {
+                if (transaction.type === 'expense') {
+                    if (!categoryTotals[transaction.category]) {
+                        categoryTotals[transaction.category] = 0;
+                    }
+                    categoryTotals[transaction.category] += parseFloat(transaction.amount);
+                }
+            });
+            
+            const categories = Object.keys(categoryTotals);
+            const amounts = categories.map(cat => categoryTotals[cat]);
+            
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+            
+            if (categories.length > 0) {
+                categoryChart = new Chart(categoryCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            data: amounts,
+                            backgroundColor: [
+                                '#4A6FA5', '#6B8CBE', '#FF6B6B', '#4CAF50', '#2196F3',
+                                '#9C27B0', '#FF9800', '#009688', '#E91E63', '#607D8B'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                                        const value = context.raw;
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ₱${value.toFixed(2)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Calendar functions
+        function generateCalendar(month, year) {
+            const calendarBody = document.getElementById('calendar-body');
+            calendarBody.innerHTML = '';
+            
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-month').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                if (date > daysInMonth) break;
+                
+                const row = document.createElement('tr');
+                
+                for (let j = 0; j < 7; j++) {
+                    if (i === 0 && j < firstDay) {
+                        const cell = document.createElement('td');
+                        row.appendChild(cell);
+                    } else if (date > daysInMonth) {
+                        const cell = document.createElement('td');
+                        row.appendChild(cell);
+                    } else {
+                        const cell = document.createElement('td');
+                        cell.textContent = date;
+                        
+                        // Highlight today
+                        const today = new Date();
+                        if (date === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                            cell.classList.add('today');
+                        }
+                        
+                        // Add events (transactions) for this date
+                        const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+                        const transactions = budgetData.transactions.filter(t => t.date === dateStr);
+                        
+                        transactions.forEach(transaction => {
+                            const eventDiv = document.createElement('div');
+                            eventDiv.className = 'calendar-event';
+                            eventDiv.textContent = `${transaction.type === 'income' ? '+' : '-'}₱${transaction.amount}`;
+                            cell.appendChild(eventDiv);
+                        });
+                        
+                        // Add click event to show transactions for this date
+                        cell.onclick = function() {
+                            showTransactionsForDate(dateStr);
+                        };
+                        
+                        row.appendChild(cell);
+                        date++;
+                    }
+                }
+                
+                calendarBody.appendChild(row);
+            }
+        }
+        
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        function goToToday() {
+            const today = new Date();
+            currentMonth = today.getMonth();
+            currentYear = today.getFullYear();
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        function showTransactionsForDate(date) {
+            document.getElementById('selected-date').textContent = date;
+            const transactions = budgetData.transactions.filter(t => t.date === date);
+            const container = document.getElementById('date-transactions');
+            container.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<li>No transactions on this date</li>';
+                return;
+            }
+            
+            transactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.className = `transaction-item transaction-${transaction.type}`;
+                
+                const leftDiv = document.createElement('div');
+                leftDiv.innerHTML = `<strong>${transaction.category}</strong><br>
+                                    <small>${transaction.notes || ''}</small>`;
+                
+                const rightDiv = document.createElement('div');
+                rightDiv.className = 'transaction-amount';
+                rightDiv.textContent = `${transaction.type === 'income' ? '+' : '-'}₱${parseFloat(transaction.amount).toFixed(2)}`;
+                
+                li.appendChild(leftDiv);
+                li.appendChild(rightDiv);
+                container.appendChild(li);
+            });
+        }
+        
+        // Budget plan functions
+        function addBudgetCategory() {
+            const container = document.getElementById('budget-categories-container');
+            const categoryCount = container.children.length;
+            
+            const div = document.createElement('div');
+            div.className = 'form-group percentage-container';
+            div.innerHTML = `
+                <label for="budget-category-${categoryCount}">Category</label>
+                <input type="text" id="budget-category-${categoryCount}" placeholder="Category name">
+                <input type="number" id="budget-percentage-${categoryCount}" class="percentage-input" placeholder="%" min="0" max="100" onchange="calculateBudgetDistribution()">
+                <button onclick="removeBudgetCategory(this)" class="btn-secondary" style="width: auto; margin-left: 8px;">Remove</button>
+            `;
+            
+            container.appendChild(div);
+            calculateBudgetDistribution();
+        }
+        
+        function removeBudgetCategory(button) {
+            button.parentElement.remove();
+            calculateBudgetDistribution();
+        }
+        
+        function calculateBudgetDistribution() {
+            const totalBudget = parseFloat(document.getElementById('total-budget').value) || 0;
+            const container = document.getElementById('budget-categories-container');
+            const categories = container.children;
+            
+            let totalPercentage = 0;
+            
+            // Calculate total allocated percentage
+            for (let i = 0; i < categories.length; i++) {
+                const percentage = parseFloat(categories[i].querySelector('input[type="number"]').value) || 0;
+                totalPercentage += percentage;
+            }
+            
+            const remainingPercentage = 100 - totalPercentage;
+            const remainingElement = document.getElementById('remaining-percentage');
+            
+            remainingElement.textContent = `Remaining to allocate: ${remainingPercentage}%`;
+            
+            if (remainingPercentage < 0) {
+                remainingElement.className = 'remaining-percentage negative';
+            } else if (remainingPercentage > 0) {
+                remainingElement.className = 'remaining-percentage positive';
+            } else {
+                remainingElement.className = 'remaining-percentage';
+            }
+            
+            // Calculate amounts for each category
+            for (let i = 0; i < categories.length; i++) {
+                const percentage = parseFloat(categories[i].querySelector('input[type="number"]').value) || 0;
+                const amount = (totalBudget * percentage / 100).toFixed(2);
+                
+                // Show the calculated amount next to the percentage
+                const amountDisplay = categories[i].querySelector('.amount-display');
+                if (amountDisplay) {
+                    amountDisplay.textContent = `₱${amount}`;
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'amount-display';
+                    span.textContent = ` ₱${amount}`;
+                    categories[i].querySelector('label').appendChild(span);
+                }
+            }
+        }
+        
+        function saveBudgetPlan() {
+            const totalBudget = parseFloat(document.getElementById('total-budget').value) || 0;
+            const type = document.getElementById('budget-type').value;
+            const container = document.getElementById('budget-categories-container');
+            const categories = container.children;
+            
+            let totalPercentage = 0;
+            budgetData.budgetItems = [];
+            budgetData.categories = [];
+            budgetData.budgetDistribution = {};
+            
+            // Save each category and its percentage
+            for (let i = 0; i < categories.length; i++) {
+                const categoryInput = categories[i].querySelector('input[type="text"]');
+                const percentageInput = categories[i].querySelector('input[type="number"]');
+                
+                const category = categoryInput.value.trim();
+                const percentage = parseFloat(percentageInput.value) || 0;
+                
+                if (category && percentage > 0) {
+                    const amount = (totalBudget * percentage / 100).toFixed(2);
+                    
+                    budgetData.budgetItems.push({
+                        category: category,
+                        amount: amount,
+                        type: type
+                    });
+                    
+                    budgetData.categories.push(category);
+                    budgetData.budgetDistribution[category] = percentage;
+                    
+                    totalPercentage += percentage;
+                }
+            }
+            
+            if (totalPercentage !== 100) {
+                alert(`Warning: Your allocation totals ${totalPercentage}%. You have ${100 - totalPercentage}% remaining.`);
+            }
+            
+            saveData();
+            updateBudgetPlanDisplay();
+            populateCategoryDropdowns();
+            
+            // Clear form
+            document.getElementById('total-budget').value = '';
+            container.innerHTML = '';
+            document.getElementById('remaining-percentage').textContent = 'Remaining to allocate: 100%';
+            document.getElementById('remaining-percentage').className = 'remaining-percentage';
+        }
+        
+        function updateBudgetPlanDisplay() {
+            const container = document.getElementById('budget-plan');
+            container.innerHTML = '';
+            
+            if (budgetData.budgetItems.length === 0) {
+                container.innerHTML = '<p>No budget plan created yet</p>';
+                return;
+            }
+            
+            // Group by type
+            const incomeItems = budgetData.budgetItems.filter(item => item.type === 'income');
+            const expenseItems = budgetData.budgetItems.filter(item => item.type === 'expense');
+            
+            if (incomeItems.length > 0) {
+                const incomeHeader = document.createElement('h4');
+                incomeHeader.textContent = 'Income';
+                container.appendChild(incomeHeader);
+                
+                incomeItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item transaction-income';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${item.category}</strong>
+                            <span class="percentage">${budgetData.budgetDistribution[item.category] || 0}%</span>
+                        </div>
+                        <div class="transaction-amount">
+                            ₱${item.amount}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            if (expenseItems.length > 0) {
+                const expenseHeader = document.createElement('h4');
+                expenseHeader.textContent = 'Expenses';
+                container.appendChild(expenseHeader);
+                
+                expenseItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item transaction-expense';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${item.category}</strong>
+                            <span class="percentage">${budgetData.budgetDistribution[item.category] || 0}%</span>
+                        </div>
+                        <div class="transaction-amount">
+                            ₱${item.amount}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+        
+        function populateCategoryDropdowns() {
+            const transactionCategory = document.getElementById('transaction-category');
+            const historyCategory = document.getElementById('history-category');
+            
+            // Clear existing options except the first one
+            while (transactionCategory.options.length > 0) {
+                transactionCategory.remove(0);
+            }
+            
+            while (historyCategory.options.length > 0) {
+                historyCategory.remove(0);
+            }
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a category';
+            transactionCategory.appendChild(defaultOption);
+            
+            // Add categories from budget items
+            budgetData.categories.forEach(category => {
+                const option1 = document.createElement('option');
+                option1.value = category;
+                option1.textContent = category;
+                transactionCategory.appendChild(option1.cloneNode(true));
+                
+                const option2 = option1.cloneNode(true);
+                historyCategory.appendChild(option2);
+            });
+        }
+        
+        // Transaction functions
+        function addTransaction() {
+            const amount = document.getElementById('transaction-amount').value;
+            const category = document.getElementById('transaction-category').value;
+            const date = document.getElementById('transaction-date').value;
+            const notes = document.getElementById('transaction-notes').value;
+            
+            if (!amount || !category || !date) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Determine type based on category
+            let type = 'expense';
+            budgetData.budgetItems.forEach(item => {
+                if (item.category === category && item.type === 'income') {
+                    type = 'income';
+                }
+            });
+            
+            // Add transaction
+            budgetData.transactions.push({
+                amount: parseFloat(amount).toFixed(2),
+                category,
+                date,
+                notes,
+                type,
+                id: Date.now()
+            });
+            
+            saveData();
+            updateDashboard();
+            updateTransactionHistory();
+            
+            // Clear form
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-notes').value = '';
+        }
+        
+        function updateTransactionHistory() {
+            const container = document.getElementById('transaction-history');
+            container.innerHTML = '';
+            
+            if (budgetData.transactions.length === 0) {
+                container.innerHTML = '<li>No transactions recorded</li>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedTransactions = [...budgetData.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTransactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.className = `transaction-item transaction-${transaction.type}`;
+                li.innerHTML = `
+                    <div>
+                        <strong>${transaction.category}</strong><br>
+                        <small>${transaction.date} - ${transaction.notes || ''}</small>
+                    </div>
+                    <div class="transaction-amount">
+                        ${transaction.type === 'income' ? '+' : '-'}₱${transaction.amount}
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+        
+        function filterHistory() {
+            const filter = document.getElementById('history-filter').value;
+            const container = document.getElementById('transaction-history');
+            container.innerHTML = '';
+            
+            // Show/hide additional filter controls
+            document.getElementById('category-filter-container').style.display = filter === 'category' ? 'block' : 'none';
+            document.getElementById('date-filter-container').style.display = filter === 'date' ? 'block' : 'none';
+            
+            let filteredTransactions = [...budgetData.transactions];
+            
+            switch (filter) {
+                case 'income':
+                    filteredTransactions = filteredTransactions.filter(t => t.type === 'income');
+                    break;
+                case 'expense':
+                    filteredTransactions = filteredTransactions.filter(t => t.type === 'expense');
+                    break;
+                case 'category':
+                    const category = document.getElementById('history-category').value;
+                    if (category) {
+                        filteredTransactions = filteredTransactions.filter(t => t.category === category);
+                    }
+                    break;
+                case 'date':
+                    const startDate = document.getElementById('history-start-date').value;
+                    const endDate = document.getElementById('history-end-date').value;
+                    
+                    if (startDate && endDate) {
+                        filteredTransactions = filteredTransactions.filter(t => {
+                            return t.date >= startDate && t.date <= endDate;
+                        });
+                    }
+                    break;
+            }
+            
+            if (filteredTransactions.length === 0) {
+                container.innerHTML = '<li>No transactions match your filter</li>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            filteredTransactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.className = `transaction-item transaction-${transaction.type}`;
+                li.innerHTML = `
+                    <div>
+                        <strong>${transaction.category}</strong><br>
+                        <small>${transaction.date} - ${transaction.notes || ''}</small>
+                    </div>
+                    <div class="transaction-amount">
+                        ${transaction.type === 'income' ? '+' : '-'}₱${transaction.amount}
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+        
+        // Goals functions
+        function addGoal() {
+            const name = document.getElementById('goal-name').value.trim();
+            const target = document.getElementById('goal-target').value;
+            const saved = document.getElementById('goal-saved').value || '0';
+            const deadline = document.getElementById('goal-deadline').value;
+            
+            if (!name || !target || !deadline) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Add goal
+            budgetData.goals.push({
+                name,
+                target: parseFloat(target).toFixed(2),
+                saved: parseFloat(saved).toFixed(2),
+                deadline,
+                id: Date.now()
+            });
+            
+            saveData();
+            updateGoalsDisplay();
+            
+            // Clear form
+            document.getElementById('goal-name').value = '';
+            document.getElementById('goal-target').value = '';
+            document.getElementById('goal-saved').value = '';
+        }
+        
+        function updateGoalsDisplay() {
+            const container = document.getElementById('goals-list');
+            container.innerHTML = '';
+            
+            if (budgetData.goals.length === 0) {
+                container.innerHTML = '<p>No goals set yet</p>';
+                return;
+            }
+            
+            budgetData.goals.forEach(goal => {
+                const progress = (goal.saved / goal.target * 100).toFixed(1);
+                
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'goal-item';
+                goalDiv.innerHTML = `
+                    <h4>${goal.name}</h4>
+                    <div>Target: ₱${goal.target} by ${goal.deadline}</div>
+                    <div>Saved: ₱${goal.saved} (${progress}%)</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${Math.min(progress, 100)}%"></div>
+                    </div>
+                    <button onclick="editGoal(${goal.id})" class="btn-secondary">Edit</button>
+                    <button onclick="deleteGoal(${goal.id})">Delete</button>
+                `;
+                
+                container.appendChild(goalDiv);
+            });
+        }
+        
+        function updateGoalsProgress() {
+            const container = document.getElementById('goals-progress');
+            container.innerHTML = '';
+            
+            if (budgetData.goals.length === 0) {
+                container.innerHTML = '<p>No active goals</p>';
+                return;
+            }
+            
+            budgetData.goals.forEach(goal => {
+                const progress = (goal.saved / goal.target * 100).toFixed(1);
+                
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'goal-item';
+                goalDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${goal.name}</span>
+                        <span>${progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${Math.min(progress, 100)}%"></div>
+                    </div>
+                `;
+                
+                container.appendChild(goalDiv);
+            });
+        }
+        
+        function editGoal(goalId) {
+            const goal = budgetData.goals.find(g => g.id === goalId);
+            if (!goal) return;
+            
+            document.getElementById('goal-name').value = goal.name;
+            document.getElementById('goal-target').value = goal.target;
+            document.getElementById('goal-saved').value = goal.saved;
+            document.getElementById('goal-deadline').value = goal.deadline;
+            
+            // Remove the old goal
+            budgetData.goals = budgetData.goals.filter(g => g.id !== goalId);
+            saveData();
+            updateGoalsDisplay();
+        }
+        
+        function deleteGoal(goalId) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                budgetData.goals = budgetData.goals.filter(g => g.id !== goalId);
+                saveData();
+                updateGoalsDisplay();
+                updateGoalsProgress();
+            }
+        }
+        
+        // Calculator functions
+        let calcDisplay = '0';
+        
+        function updateCalcDisplay() {
+            document.getElementById('calc-display').textContent = calcDisplay;
+        }
+        
+        function appendToCalc(value) {
+            if (calcDisplay === '0' && value !== '.') {
+                calcDisplay = value;
+            } else {
+                calcDisplay += value;
+            }
+            
+            updateCalcDisplay();
+        }
+        
+        function clearCalculator() {
+            calcDisplay = '0';
+            updateCalcDisplay();
+        }
+        
+        function calculate() {
+            try {
+                calcDisplay = eval(calcDisplay).toString();
+                updateCalcDisplay();
+            } catch (e) {
+                calcDisplay = 'Error';
+                updateCalcDisplay();
+                setTimeout(clearCalculator, 1000);
+            }
+        }
+        
+        // Data management
+        function saveData() {
+            localStorage.setItem('budgetData', JSON.stringify(budgetData));
+            
+            // If connected to Google, also save to cloud
+            if (isLoggedIn && userId) {
+                syncWithCloud();
+            }
+        }
+        
+        function syncWithCloud() {
+            // This function will be called to sync data with Firebase
+            if (typeof Android !== 'undefined' && Android.saveData) {
+                const dataToSave = {
+                    userId: userId,
+                    budgetData: budgetData
+                };
+                Android.saveData(JSON.stringify(dataToSave));
+            } else {
+                console.log('Not connected to Android app. Data saved locally only.');
+            }
+        }
+        
+        function loadFromCloud() {
+            // This function will be called to load data from Firebase
+            if (typeof Android !== 'undefined' && Android.loadData) {
+                Android.loadData();
+            } else {
+                console.log('Not connected to Android app. Using local data only.');
+            }
+        }
+        
+        // This function is called from Android when data is loaded from Firebase
+        function setBudgetDataFromCloud(data) {
+            try {
+                const parsedData = JSON.parse(data);
+                budgetData = parsedData.budgetData || {
+                    budgetItems: [],
+                    transactions: [],
+                    goals: [],
+                    categories: [],
+                    budgetDistribution: {}
+                };
+                
+                saveData();
+                updateDashboard();
+                generateCalendar(currentMonth, currentYear);
+                updateBudgetPlanDisplay();
+                updateGoalsDisplay();
+                updateTransactionHistory();
+                populateCategoryDropdowns();
+                
+                console.log('Data loaded successfully from cloud!');
+            } catch (e) {
+                console.error('Error loading data from cloud:', e.message);
+            }
+        }
+        
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
+                // Clear all data
+                budgetData = {
+                    budgetItems: [],
+                    transactions: [],
+                    goals: [],
+                    categories: [],
+                    budgetDistribution: {}
+                };
+                
+                // Save the empty data
+                saveData();
+                
+                // Refresh all displays
+                updateDashboard();
+                generateCalendar(currentMonth, currentYear);
+                updateBudgetPlanDisplay();
+                updateGoalsDisplay();
+                updateTransactionHistory();
+                populateCategoryDropdowns();
+                
+                // Reset the budget categories container
+                document.getElementById('budget-categories-container').innerHTML = '';
+                addBudgetCategory();
+                document.getElementById('total-budget').value = '';
+                document.getElementById('remaining-percentage').textContent = 'Remaining to allocate: 100%';
+                document.getElementById('remaining-percentage').className = 'remaining-percentage';
+                
+                alert('All data has been reset successfully!');
+            }
+        }
+    </script>
+</body>
+</html>
