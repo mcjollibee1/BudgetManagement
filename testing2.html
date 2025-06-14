@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Budget Manager</title>
+    <style>
+        :root {
+            --primary: #4285F4; /* Google blue */
+            --secondary: #34A853; /* Google green */
+            --accent: #EA4335; /* Google red */
+            --light: #F1F3F4; /* Light gray */
+            --dark: #202124; /* Dark gray */
+            --success: #34A853; /* Google green */
+            --info: #4285F4; /* Google blue */
+            --warning: #FBBC05; /* Google yellow */
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--info));
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        h1, h2, h3 {
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+        }
+        
+        h3 {
+            font-size: 1.1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background-color: white;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab {
+            padding: 12px 15px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .balance {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+        
+        .positive {
+            color: var(--success);
+        }
+        
+        .negative {
+            color: var(--accent);
+        }
+        
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-income {
+            border-left: 4px solid var(--success);
+            padding-left: 10px;
+        }
+        
+        .transaction-expense {
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+        
+        .transaction-amount {
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d33426;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            border-radius: 5px;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .goal-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .goal-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            background-color: var(--light);
+        }
+        
+        .amount-display {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .button-group button {
+            flex: 1;
+        }
+        
+        /* Calendar styles */
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .calendar th, .calendar td {
+            border: 1px solid #eee;
+            padding: 5px;
+            text-align: center;
+            height: 40px;
+        }
+        
+        .calendar th {
+            background-color: var(--light);
+            font-weight: 500;
+        }
+        
+        .calendar .today {
+            background-color: rgba(66, 133, 244, 0.1);
+            border: 2px solid var(--primary);
+        }
+        
+        .calendar-event {
+            font-size: 0.7rem;
+            background-color: var(--info);
+            color: white;
+            padding: 1px 3px;
+            border-radius: 3px;
+            margin: 1px 0;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Responsive adjustments */
+        @media (min-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .tabs {
+                border-radius: 10px;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Student Budget Manager</h1>
+            <p>Track your finances easily</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('dashboard')">Dashboard</div>
+            <div class="tab" onclick="openTab('transactions')">Transactions</div>
+            <div class="tab" onclick="openTab('budget')">Budget</div>
+            <div class="tab" onclick="openTab('goals')">Goals</div>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="card">
+                <h3>Current Balance</h3>
+                <div class="balance" id="current-balance">₱0.00</div>
+                <div>Available to spend</div>
+            </div>
+            
+            <div class="card">
+                <h3>Monthly Summary</h3>
+                <div>Income: <span id="monthly-income">₱0.00</span></div>
+                <div>Expenses: <span id="monthly-expenses">₱0.00</span></div>
+                <div>Savings: <span id="monthly-savings">₱0.00</span></div>
+            </div>
+            
+            <div class="card">
+                <h3>Recent Transactions</h3>
+                <ul class="transaction-list" id="recent-transactions">
+                    <li>No recent transactions</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>Financial Goals</h3>
+                <div id="goals-progress">
+                    <p>No active goals</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transactions Tab -->
+        <div id="transactions" class="tab-content">
+            <div class="card">
+                <h3>Add Transaction</h3>
+                <div class="form-group">
+                    <label for="transaction-type">Type</label>
+                    <select id="transaction-type" onchange="toggleTransactionFields()">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transaction-amount">Amount (₱)</label>
+                    <input type="number" id="transaction-amount" placeholder="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transaction-category">Category</label>
+                    <select id="transaction-category">
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Education">Education</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transaction-date">Date</label>
+                    <input type="date" id="transaction-date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transaction-notes">Notes (Optional)</label>
+                    <input type="text" id="transaction-notes" placeholder="Description">
+                </div>
+                
+                <button onclick="addTransaction()">Add Transaction</button>
+            </div>
+            
+            <div class="card">
+                <h3>Transaction History</h3>
+                <div class="form-group">
+                    <label for="history-filter">Filter by:</label>
+                    <select id="history-filter" onchange="filterHistory()">
+                        <option value="all">All Transactions</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expenses</option>
+                        <option value="category">By Category</option>
+                    </select>
+                </div>
+                
+                <div id="category-filter-container" class="hidden">
+                    <label for="history-category">Select Category:</label>
+                    <select id="history-category">
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Housing">Housing</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Education">Education</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <ul class="transaction-list" id="transaction-history">
+                    <li>No transactions recorded</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Budget Tab -->
+        <div id="budget" class="tab-content">
+            <div class="card">
+                <h3>Budget Plan</h3>
+                <div class="form-group">
+                    <label for="monthly-income">Monthly Income (₱)</label>
+                    <input type="number" id="monthly-income" placeholder="0.00" onchange="updateBudgetPlan()">
+                </div>
+                
+                <h4>Expense Categories</h4>
+                <div id="budget-categories">
+                    <div class="form-group">
+                        <label>Food (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Food" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                    <div class="form-group">
+                        <label>Transportation (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Transportation" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                    <div class="form-group">
+                        <label>Housing (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Housing" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                    <div class="form-group">
+                        <label>Entertainment (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Entertainment" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                    <div class="form-group">
+                        <label>Education (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Education" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                    <div class="form-group">
+                        <label>Other (%)</label>
+                        <input type="number" class="budget-percentage" data-category="Other" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
+                    </div>
+                </div>
+                
+                <div class="remaining-percentage" id="remaining-percentage">
+                    Remaining to allocate: 100%
+                </div>
+                
+                <button onclick="saveBudgetPlan()">Save Budget Plan</button>
+            </div>
+            
+            <div class="card">
+                <h3>Budget Summary</h3>
+                <div id="budget-summary">
+                    <p>No budget plan created yet</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Goals Tab -->
+        <div id="goals" class="tab-content">
+            <div class="card">
+                <h3>Set Financial Goal</h3>
+                <div class="form-group">
+                    <label for="goal-name">Goal Name</label>
+                    <input type="text" id="goal-name" placeholder="e.g. New Laptop, Vacation">
+                </div>
+                <div class="form-group">
+                    <label for="goal-target">Target Amount (₱)</label>
+                    <input type="number" id="goal-target" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="goal-saved">Amount Saved (₱)</label>
+                    <input type="number" id="goal-saved" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="goal-deadline">Target Date</label>
+                    <input type="date" id="goal-deadline">
+                </div>
+                <button onclick="addGoal()">Add Goal</button>
+            </div>
+            
+            <div class="card">
+                <h3>Your Financial Goals</h3>
+                <div id="goals-list">
+                    <p>No goals set yet</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="resetAllData()" class="btn-danger">Reset All Data</button>
+        </div>
+    </div>
+    
+    <script>
+        // Simple data storage (will be replaced with MIT App Inventor storage)
+        let budgetData = {
+            transactions: [],
+            budget: {
+                income: 0,
+                categories: {
+                    Food: 0,
+                    Transportation: 0,
+                    Housing: 0,
+                    Entertainment: 0,
+                    Education: 0,
+                    Other: 0
+                }
+            },
+            goals: []
+        };
+        
+        // Load data from localStorage (for web version)
+        function loadData() {
+            const savedData = localStorage.getItem('studentBudgetData');
+            if (savedData) {
+                budgetData = JSON.parse(savedData);
+            }
+            
+            // Initialize date fields with today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('transaction-date').value = today;
+            document.getElementById('goal-deadline').value = today;
+            
+            updateDashboard();
+            updateTransactionHistory();
+            updateBudgetDisplay();
+            updateGoalsDisplay();
+        }
+        
+        // Save data to localStorage (for web version)
+        function saveData() {
+            localStorage.setItem('studentBudgetData', JSON.stringify(budgetData));
+            
+            // For MIT App Inventor integration
+            if (typeof Android !== 'undefined' && Android.saveData) {
+                Android.saveData(JSON.stringify(budgetData));
+            }
+        }
+        
+        // Tab navigation
+        function openTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Dashboard functions
+        function updateDashboard() {
+            // Calculate current balance
+            let balance = 0;
+            let income = 0;
+            let expenses = 0;
+            
+            budgetData.transactions.forEach(transaction => {
+                if (transaction.type === 'income') {
+                    balance += parseFloat(transaction.amount);
+                    income += parseFloat(transaction.amount);
+                } else {
+                    balance -= parseFloat(transaction.amount);
+                    expenses += parseFloat(transaction.amount);
+                }
+            });
+            
+            // Update balance display
+            const balanceElement = document.getElementById('current-balance');
+            balanceElement.textContent = `₱${balance.toFixed(2)}`;
+            balanceElement.className = 'balance ' + (balance >= 0 ? 'positive' : 'negative');
+            
+            // Update monthly summary
+            document.getElementById('monthly-income').textContent = `₱${income.toFixed(2)}`;
+            document.getElementById('monthly-expenses').textContent = `₱${expenses.toFixed(2)}`;
+            document.getElementById('monthly-savings').textContent = `₱${(income - expenses).toFixed(2)}`;
+            
+            // Update recent transactions
+            const recentTransactions = document.getElementById('recent-transactions');
+            recentTransactions.innerHTML = '';
+            
+            const sortedTransactions = [...budgetData.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const recent = sortedTransactions.slice(0, 3);
+            
+            if (recent.length === 0) {
+                recentTransactions.innerHTML = '<li>No recent transactions</li>';
+            } else {
+                recent.forEach(transaction => {
+                    const li = document.createElement('li');
+                    li.className = `transaction-item transaction-${transaction.type}`;
+                    
+                    const leftDiv = document.createElement('div');
+                    leftDiv.innerHTML = `<strong>${transaction.category}</strong><br>
+                                        <small>${transaction.date} - ${transaction.notes || ''}</small>`;
+                    
+                    const rightDiv = document.createElement('div');
+                    rightDiv.className = 'transaction-amount';
+                    rightDiv.textContent = `${transaction.type === 'income' ? '+' : '-'}₱${parseFloat(transaction.amount).toFixed(2)}`;
+                    
+                    li.appendChild(leftDiv);
+                    li.appendChild(rightDiv);
+                    recentTransactions.appendChild(li);
+                });
+            }
+            
+            // Update goals progress
+            updateGoalsProgress();
+        }
+        
+        // Transaction functions
+        function toggleTransactionFields() {
+            // This function can be used to show/hide fields based on transaction type
+            // Currently not needed in this simplified version
+        }
+        
+        function addTransaction() {
+            const amount = document.getElementById('transaction-amount').value;
+            const category = document.getElementById('transaction-category').value;
+            const date = document.getElementById('transaction-date').value;
+            const notes = document.getElementById('transaction-notes').value;
+            const type = document.getElementById('transaction-type').value;
+            
+            if (!amount || !date) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Add transaction
+            budgetData.transactions.push({
+                amount: parseFloat(amount).toFixed(2),
+                category,
+                date,
+                notes,
+                type,
+                id: Date.now()
+            });
+            
+            saveData();
+            updateDashboard();
+            updateTransactionHistory();
+            
+            // Clear form
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-notes').value = '';
+        }
+        
+        function updateTransactionHistory() {
+            const container = document.getElementById('transaction-history');
+            container.innerHTML = '';
+            
+            if (budgetData.transactions.length === 0) {
+                container.innerHTML = '<li>No transactions recorded</li>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedTransactions = [...budgetData.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTransactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.className = `transaction-item transaction-${transaction.type}`;
+                li.innerHTML = `
+                    <div>
+                        <strong>${transaction.category}</strong><br>
+                        <small>${transaction.date} - ${transaction.notes || ''}</small>
+                    </div>
+                    <div class="transaction-amount">
+                        ${transaction.type === 'income' ? '+' : '-'}₱${transaction.amount}
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+        
+        function filterHistory() {
+            const filter = document.getElementById('history-filter').value;
+            const container = document.getElementById('transaction-history');
+            container.innerHTML = '';
+            
+            // Show/hide additional filter controls
+            document.getElementById('category-filter-container').className = filter === 'category' ? '' : 'hidden';
+            
+            let filteredTransactions = [...budgetData.transactions];
+            
+            switch (filter) {
+                case 'income':
+                    filteredTransactions = filteredTransactions.filter(t => t.type === 'income');
+                    break;
+                case 'expense':
+                    filteredTransactions = filteredTransactions.filter(t => t.type === 'expense');
+                    break;
+                case 'category':
+                    const category = document.getElementById('history-category').value;
+                    filteredTransactions = filteredTransactions.filter(t => t.category === category);
+                    break;
+            }
+            
+            if (filteredTransactions.length === 0) {
+                container.innerHTML = '<li>No transactions match your filter</li>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            filteredTransactions.forEach(transaction => {
+                const li = document.createElement('li');
+                li.className = `transaction-item transaction-${transaction.type}`;
+                li.innerHTML = `
+                    <div>
+                        <strong>${transaction.category}</strong><br>
+                        <small>${transaction.date} - ${transaction.notes || ''}</small>
+                    </div>
+                    <div class="transaction-amount">
+                        ${transaction.type === 'income' ? '+' : '-'}₱${transaction.amount}
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+        
+        // Budget functions
+        function updateBudgetPlan() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            const percentageInputs = document.querySelectorAll('.budget-percentage');
+            
+            let totalPercentage = 0;
+            
+            // Calculate total allocated percentage
+            percentageInputs.forEach(input => {
+                const percentage = parseFloat(input.value) || 0;
+                totalPercentage += percentage;
+            });
+            
+            const remainingPercentage = 100 - totalPercentage;
+            const remainingElement = document.getElementById('remaining-percentage');
+            
+            remainingElement.textContent = `Remaining to allocate: ${remainingPercentage}%`;
+            
+            if (remainingPercentage < 0) {
+                remainingElement.style.color = 'var(--accent)';
+            } else if (remainingPercentage > 0) {
+                remainingElement.style.color = 'var(--success)';
+            } else {
+                remainingElement.style.color = 'inherit';
+            }
+        }
+        
+        function saveBudgetPlan() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            const percentageInputs = document.querySelectorAll('.budget-percentage');
+            
+            let totalPercentage = 0;
+            
+            // Save budget data
+            budgetData.budget.income = income;
+            
+            percentageInputs.forEach(input => {
+                const category = input.dataset.category;
+                const percentage = parseFloat(input.value) || 0;
+                
+                budgetData.budget.categories[category] = percentage;
+                totalPercentage += percentage;
+            });
+            
+            if (totalPercentage > 100) {
+                alert('Total percentage cannot exceed 100%');
+                return;
+            }
+            
+            saveData();
+            updateBudgetDisplay();
+            alert('Budget plan saved successfully!');
+        }
+        
+        function updateBudgetDisplay() {
+            const container = document.getElementById('budget-summary');
+            container.innerHTML = '';
+            
+            if (budgetData.budget.income <= 0) {
+                container.innerHTML = '<p>No budget plan created yet</p>';
+                return;
+            }
+            
+            const incomeDiv = document.createElement('div');
+            incomeDiv.innerHTML = `<h4>Monthly Income: ₱${budgetData.budget.income.toFixed(2)}</h4>`;
+            container.appendChild(incomeDiv);
+            
+            const expensesHeader = document.createElement('h4');
+            expensesHeader.textContent = 'Expense Allocation:';
+            container.appendChild(expensesHeader);
+            
+            for (const category in budgetData.budget.categories) {
+                const percentage = budgetData.budget.categories[category];
+                if (percentage > 0) {
+                    const amount = (budgetData.budget.income * percentage / 100).toFixed(2);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${category}</strong>
+                            <span>${percentage}%</span>
+                        </div>
+                        <div class="transaction-amount">
+                            ₱${amount}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                }
+            }
+        }
+        
+        // Goals functions
+        function addGoal() {
+            const name = document.getElementById('goal-name').value.trim();
+            const target = document.getElementById('goal-target').value;
+            const saved = document.getElementById('goal-saved').value || '0';
+            const deadline = document.getElementById('goal-deadline').value;
+            
+            if (!name || !target || !deadline) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Add goal
+            budgetData.goals.push({
+                name,
+                target: parseFloat(target).toFixed(2),
+                saved: parseFloat(saved).toFixed(2),
+                deadline,
+                id: Date.now()
+            });
+            
+            saveData();
+            updateGoalsDisplay();
+            updateGoalsProgress();
+            
+            // Clear form
+            document.getElementById('goal-name').value = '';
+            document.getElementById('goal-target').value = '';
+            document.getElementById('goal-saved').value = '';
+        }
+        
+        function updateGoalsDisplay() {
+            const container = document.getElementById('goals-list');
+            container.innerHTML = '';
+            
+            if (budgetData.goals.length === 0) {
+                container.innerHTML = '<p>No goals set yet</p>';
+                return;
+            }
+            
+            budgetData.goals.forEach(goal => {
+                const progress = (goal.saved / goal.target * 100).toFixed(1);
+                
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'goal-item';
+                goalDiv.innerHTML = `
+                    <h4>${goal.name}</h4>
+                    <div>Target: ₱${goal.target} by ${goal.deadline}</div>
+                    <div>Saved: ₱${goal.saved} (${progress}%)</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${Math.min(progress, 100)}%"></div>
+                    </div>
+                    <div class="button-group">
+                        <button onclick="editGoal(${goal.id})" class="btn-secondary">Edit</button>
+                        <button onclick="deleteGoal(${goal.id})" class="btn-danger">Delete</button>
+                    </div>
+                `;
+                
+                container.appendChild(goalDiv);
+            });
+        }
+        
+        function updateGoalsProgress() {
+            const container = document.getElementById('goals-progress');
+            container.innerHTML = '';
+            
+            if (budgetData.goals.length === 0) {
+                container.innerHTML = '<p>No active goals</p>';
+                return;
+            }
+            
+            budgetData.goals.forEach(goal => {
+                const progress = (goal.saved / goal.target * 100).toFixed(1);
+                
+                const goalDiv = document.createElement('div');
+                goalDiv.className = 'goal-item';
+                goalDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${goal.name}</span>
+                        <span>${progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${Math.min(progress, 100)}%"></div>
+                    </div>
+                `;
+                
+                container.appendChild(goalDiv);
+            });
+        }
+        
+        function editGoal(goalId) {
+            const goal = budgetData.goals.find(g => g.id === goalId);
+            if (!goal) return;
+            
+            document.getElementById('goal-name').value = goal.name;
+            document.getElementById('goal-target').value = goal.target;
+            document.getElementById('goal-saved').value = goal.saved;
+            document.getElementById('goal-deadline').value = goal.deadline;
+            
+            // Remove the old goal
+            budgetData.goals = budgetData.goals.filter(g => g.id !== goalId);
+            saveData();
+            updateGoalsDisplay();
+            updateGoalsProgress();
+        }
+        
+        function deleteGoal(goalId) {
+            if (confirm('Are you sure you want to delete this goal?')) {
+                budgetData.goals = budgetData.goals.filter(g => g.id !== goalId);
+                saveData();
+                updateGoalsDisplay();
+                updateGoalsProgress();
+            }
+        }
+        
+        // Data management
+        function resetAllData() {
+            if (confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
+                budgetData = {
+                    transactions: [],
+                    budget: {
+                        income: 0,
+                        categories: {
+                            Food: 0,
+                            Transportation: 0,
+                            Housing: 0,
+                            Entertainment: 0,
+                            Education: 0,
+                            Other: 0
+                        }
+                    },
+                    goals: []
+                };
+                
+                saveData();
+                updateDashboard();
+                updateTransactionHistory();
+                updateBudgetDisplay();
+                updateGoalsDisplay();
+                
+                // Reset form fields
+                document.getElementById('monthly-income').value = '';
+                document.querySelectorAll('.budget-percentage').forEach(input => {
+                    input.value = '';
+                });
+                document.getElementById('remaining-percentage').textContent = 'Remaining to allocate: 100%';
+                document.getElementById('remaining-percentage').style.color = 'inherit';
+                
+                alert('All data has been reset!');
+            }
+        }
+        
+        // MIT App Inventor integration
+        function setUserData(userData) {
+            // This function will be called from MIT App Inventor with the Google user data
+            try {
+                const data = JSON.parse(userData);
+                // You can use the user data to personalize the app
+                if (data.name) {
+                    document.querySelector('header h1').textContent = `${data.name}'s Budget`;
+                }
+                
+                // Load user-specific data if available
+                if (data.userId && localStorage.getItem(`budgetData_${data.userId}`)) {
+                    budgetData = JSON.parse(localStorage.getItem(`budgetData_${data.userId}`));
+                    updateDashboard();
+                    updateTransactionHistory();
+                    updateBudgetDisplay();
+                    updateGoalsDisplay();
+                }
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+            }
+        }
+        
+        // Initialize the app
+        loadData();
+    </script>
+</body>
+</html>
