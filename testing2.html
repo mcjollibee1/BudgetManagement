@@ -6,14 +6,14 @@
     <title>Student Budget Manager</title>
     <style>
         :root {
-            --primary: #4285F4; /* Google blue */
-            --secondary: #34A853; /* Google green */
-            --accent: #EA4335; /* Google red */
-            --light: #F1F3F4; /* Light gray */
-            --dark: #202124; /* Dark gray */
-            --success: #34A853; /* Google green */
-            --info: #4285F4; /* Google blue */
-            --warning: #FBBC05; /* Google yellow */
+            --primary: #4285F4;
+            --secondary: #34A853;
+            --accent: #EA4335;
+            --light: #F1F3F4;
+            --dark: #202124;
+            --success: #34A853;
+            --info: #4285F4;
+            --warning: #FBBC05;
         }
         
         * {
@@ -262,44 +262,23 @@
             flex: 1;
         }
         
-        /* Calendar styles */
-        .calendar {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
+        .category-type {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
         }
         
-        .calendar th, .calendar td {
-            border: 1px solid #eee;
-            padding: 5px;
-            text-align: center;
-            height: 40px;
+        .category-type label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 0;
         }
         
-        .calendar th {
-            background-color: var(--light);
-            font-weight: 500;
+        .category-type input {
+            width: auto;
         }
         
-        .calendar .today {
-            background-color: rgba(66, 133, 244, 0.1);
-            border: 2px solid var(--primary);
-        }
-        
-        .calendar-event {
-            font-size: 0.7rem;
-            background-color: var(--info);
-            color: white;
-            padding: 1px 3px;
-            border-radius: 3px;
-            margin: 1px 0;
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        /* Responsive adjustments */
         @media (min-width: 480px) {
             .container {
                 padding: 15px;
@@ -371,7 +350,7 @@
                 <h3>Add Transaction</h3>
                 <div class="form-group">
                     <label for="transaction-type">Type</label>
-                    <select id="transaction-type" onchange="toggleTransactionFields()">
+                    <select id="transaction-type">
                         <option value="expense">Expense</option>
                         <option value="income">Income</option>
                     </select>
@@ -385,12 +364,7 @@
                 <div class="form-group">
                     <label for="transaction-category">Category</label>
                     <select id="transaction-category">
-                        <option value="Food">Food</option>
-                        <option value="Transportation">Transportation</option>
-                        <option value="Housing">Housing</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Education">Education</option>
-                        <option value="Other">Other</option>
+                        <!-- Categories will be populated from budget items -->
                     </select>
                 </div>
                 
@@ -422,12 +396,7 @@
                 <div id="category-filter-container" class="hidden">
                     <label for="history-category">Select Category:</label>
                     <select id="history-category">
-                        <option value="Food">Food</option>
-                        <option value="Transportation">Transportation</option>
-                        <option value="Housing">Housing</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Education">Education</option>
-                        <option value="Other">Other</option>
+                        <!-- Categories will be populated -->
                     </select>
                 </div>
                 
@@ -446,32 +415,13 @@
                     <input type="number" id="monthly-income" placeholder="0.00" onchange="updateBudgetPlan()">
                 </div>
                 
-                <h4>Expense Categories</h4>
+                <h4>Custom Categories</h4>
                 <div id="budget-categories">
-                    <div class="form-group">
-                        <label>Food (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Food" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
-                    <div class="form-group">
-                        <label>Transportation (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Transportation" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
-                    <div class="form-group">
-                        <label>Housing (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Housing" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
-                    <div class="form-group">
-                        <label>Entertainment (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Entertainment" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
-                    <div class="form-group">
-                        <label>Education (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Education" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
-                    <div class="form-group">
-                        <label>Other (%)</label>
-                        <input type="number" class="budget-percentage" data-category="Other" placeholder="0" min="0" max="100" onchange="updateBudgetPlan()">
-                    </div>
+                    <!-- Categories will be added here -->
+                </div>
+                
+                <div class="form-group">
+                    <button onclick="addBudgetCategory()">Add Category</button>
                 </div>
                 
                 <div class="remaining-percentage" id="remaining-percentage">
@@ -526,19 +476,12 @@
     </div>
     
     <script>
-        // Simple data storage (will be replaced with MIT App Inventor storage)
+        // Simple data storage
         let budgetData = {
             transactions: [],
             budget: {
                 income: 0,
-                categories: {
-                    Food: 0,
-                    Transportation: 0,
-                    Housing: 0,
-                    Entertainment: 0,
-                    Education: 0,
-                    Other: 0
-                }
+                categories: []
             },
             goals: []
         };
@@ -555,10 +498,18 @@
             document.getElementById('transaction-date').value = today;
             document.getElementById('goal-deadline').value = today;
             
+            // Initialize with one category if empty
+            if (budgetData.budget.categories.length === 0) {
+                addBudgetCategory();
+            } else {
+                renderBudgetCategories();
+            }
+            
             updateDashboard();
             updateTransactionHistory();
             updateBudgetDisplay();
             updateGoalsDisplay();
+            populateCategoryDropdowns();
         }
         
         // Save data to localStorage (for web version)
@@ -647,12 +598,250 @@
             updateGoalsProgress();
         }
         
-        // Transaction functions
-        function toggleTransactionFields() {
-            // This function can be used to show/hide fields based on transaction type
-            // Currently not needed in this simplified version
+        // Budget Category Functions
+        function addBudgetCategory() {
+            const newId = Date.now();
+            budgetData.budget.categories.push({
+                id: newId,
+                name: '',
+                type: 'expense',
+                percentage: 0
+            });
+            
+            renderBudgetCategories();
+            updateBudgetPlan();
         }
         
+        function removeBudgetCategory(id) {
+            budgetData.budget.categories = budgetData.budget.categories.filter(cat => cat.id !== id);
+            renderBudgetCategories();
+            updateBudgetPlan();
+        }
+        
+        function renderBudgetCategories() {
+            const container = document.getElementById('budget-categories');
+            container.innerHTML = '';
+            
+            budgetData.budget.categories.forEach((category, index) => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+                div.innerHTML = `
+                    <label for="category-name-${category.id}">Category Name</label>
+                    <input type="text" id="category-name-${category.id}" 
+                           value="${category.name}" 
+                           placeholder="Category name"
+                           onchange="updateCategoryName(${category.id}, this.value)">
+                    
+                    <div class="category-type">
+                        <label>
+                            <input type="radio" name="category-type-${category.id}" 
+                                   value="expense" ${category.type === 'expense' ? 'checked' : ''}
+                                   onchange="updateCategoryType(${category.id}, 'expense')">
+                            Expense
+                        </label>
+                        <label>
+                            <input type="radio" name="category-type-${category.id}" 
+                                   value="income" ${category.type === 'income' ? 'checked' : ''}
+                                   onchange="updateCategoryType(${category.id}, 'income')">
+                            Income
+                        </label>
+                    </div>
+                    
+                    <label for="category-percentage-${category.id}">Percentage</label>
+                    <input type="number" id="category-percentage-${category.id}" 
+                           value="${category.percentage}" 
+                           placeholder="0" min="0" max="100" 
+                           onchange="updateCategoryPercentage(${category.id}, this.value)">
+                    
+                    <button onclick="removeBudgetCategory(${category.id})" class="btn-danger">Remove</button>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function updateCategoryName(id, name) {
+            const category = budgetData.budget.categories.find(cat => cat.id === id);
+            if (category) {
+                category.name = name;
+                saveData();
+                populateCategoryDropdowns();
+            }
+        }
+        
+        function updateCategoryType(id, type) {
+            const category = budgetData.budget.categories.find(cat => cat.id === id);
+            if (category) {
+                category.type = type;
+                saveData();
+                populateCategoryDropdowns();
+            }
+        }
+        
+        function updateCategoryPercentage(id, percentage) {
+            const category = budgetData.budget.categories.find(cat => cat.id === id);
+            if (category) {
+                category.percentage = parseFloat(percentage) || 0;
+                updateBudgetPlan();
+            }
+        }
+        
+        function updateBudgetPlan() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            
+            let totalPercentage = 0;
+            
+            // Calculate total allocated percentage
+            budgetData.budget.categories.forEach(category => {
+                totalPercentage += category.percentage;
+            });
+            
+            const remainingPercentage = 100 - totalPercentage;
+            const remainingElement = document.getElementById('remaining-percentage');
+            
+            remainingElement.textContent = `Remaining to allocate: ${remainingPercentage}%`;
+            
+            if (remainingPercentage < 0) {
+                remainingElement.style.color = 'var(--accent)';
+            } else if (remainingPercentage > 0) {
+                remainingElement.style.color = 'var(--success)';
+            } else {
+                remainingElement.style.color = 'inherit';
+            }
+        }
+        
+        function saveBudgetPlan() {
+            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
+            
+            let totalPercentage = 0;
+            
+            // Validate categories
+            for (const category of budgetData.budget.categories) {
+                if (!category.name.trim()) {
+                    alert('Please enter a name for all categories');
+                    return;
+                }
+                
+                totalPercentage += category.percentage;
+            }
+            
+            if (totalPercentage > 100) {
+                alert('Total percentage cannot exceed 100%');
+                return;
+            }
+            
+            // Save budget data
+            budgetData.budget.income = income;
+            
+            saveData();
+            updateBudgetDisplay();
+            populateCategoryDropdowns();
+            alert('Budget plan saved successfully!');
+        }
+        
+        function updateBudgetDisplay() {
+            const container = document.getElementById('budget-summary');
+            container.innerHTML = '';
+            
+            if (budgetData.budget.income <= 0) {
+                container.innerHTML = '<p>No budget plan created yet</p>';
+                return;
+            }
+            
+            const incomeDiv = document.createElement('div');
+            incomeDiv.innerHTML = `<h4>Monthly Income: ₱${budgetData.budget.income.toFixed(2)}</h4>`;
+            container.appendChild(incomeDiv);
+            
+            // Group categories by type
+            const incomeCategories = budgetData.budget.categories.filter(cat => cat.type === 'income');
+            const expenseCategories = budgetData.budget.categories.filter(cat => cat.type === 'expense');
+            
+            if (incomeCategories.length > 0) {
+                const incomeHeader = document.createElement('h4');
+                incomeHeader.textContent = 'Income Categories:';
+                container.appendChild(incomeHeader);
+                
+                incomeCategories.forEach(category => {
+                    const amount = (budgetData.budget.income * category.percentage / 100).toFixed(2);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item transaction-income';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${category.name}</strong>
+                            <span>${category.percentage}%</span>
+                        </div>
+                        <div class="transaction-amount">
+                            ₱${amount}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            if (expenseCategories.length > 0) {
+                const expenseHeader = document.createElement('h4');
+                expenseHeader.textContent = 'Expense Categories:';
+                container.appendChild(expenseHeader);
+                
+                expenseCategories.forEach(category => {
+                    const amount = (budgetData.budget.income * category.percentage / 100).toFixed(2);
+                    
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item transaction-expense';
+                    div.innerHTML = `
+                        <div>
+                            <strong>${category.name}</strong>
+                            <span>${category.percentage}%</span>
+                        </div>
+                        <div class="transaction-amount">
+                            ₱${amount}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+        }
+        
+        function populateCategoryDropdowns() {
+            const transactionCategory = document.getElementById('transaction-category');
+            const historyCategory = document.getElementById('history-category');
+            
+            // Clear existing options
+            transactionCategory.innerHTML = '';
+            historyCategory.innerHTML = '';
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a category';
+            transactionCategory.appendChild(defaultOption.cloneNode(true));
+            historyCategory.appendChild(defaultOption.cloneNode(true));
+            
+            // Add income categories
+            budgetData.budget.categories
+                .filter(cat => cat.type === 'income')
+                .forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    transactionCategory.appendChild(option.cloneNode(true));
+                    historyCategory.appendChild(option.cloneNode(true));
+                });
+            
+            // Add expense categories
+            budgetData.budget.categories
+                .filter(cat => cat.type === 'expense')
+                .forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    transactionCategory.appendChild(option.cloneNode(true));
+                    historyCategory.appendChild(option.cloneNode(true));
+                });
+        }
+        
+        // Transaction functions
         function addTransaction() {
             const amount = document.getElementById('transaction-amount').value;
             const category = document.getElementById('transaction-category').value;
@@ -660,7 +849,7 @@
             const notes = document.getElementById('transaction-notes').value;
             const type = document.getElementById('transaction-type').value;
             
-            if (!amount || !date) {
+            if (!amount || !category || !date) {
                 alert('Please fill in all required fields');
                 return;
             }
@@ -757,98 +946,6 @@
                 `;
                 container.appendChild(li);
             });
-        }
-        
-        // Budget functions
-        function updateBudgetPlan() {
-            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
-            const percentageInputs = document.querySelectorAll('.budget-percentage');
-            
-            let totalPercentage = 0;
-            
-            // Calculate total allocated percentage
-            percentageInputs.forEach(input => {
-                const percentage = parseFloat(input.value) || 0;
-                totalPercentage += percentage;
-            });
-            
-            const remainingPercentage = 100 - totalPercentage;
-            const remainingElement = document.getElementById('remaining-percentage');
-            
-            remainingElement.textContent = `Remaining to allocate: ${remainingPercentage}%`;
-            
-            if (remainingPercentage < 0) {
-                remainingElement.style.color = 'var(--accent)';
-            } else if (remainingPercentage > 0) {
-                remainingElement.style.color = 'var(--success)';
-            } else {
-                remainingElement.style.color = 'inherit';
-            }
-        }
-        
-        function saveBudgetPlan() {
-            const income = parseFloat(document.getElementById('monthly-income').value) || 0;
-            const percentageInputs = document.querySelectorAll('.budget-percentage');
-            
-            let totalPercentage = 0;
-            
-            // Save budget data
-            budgetData.budget.income = income;
-            
-            percentageInputs.forEach(input => {
-                const category = input.dataset.category;
-                const percentage = parseFloat(input.value) || 0;
-                
-                budgetData.budget.categories[category] = percentage;
-                totalPercentage += percentage;
-            });
-            
-            if (totalPercentage > 100) {
-                alert('Total percentage cannot exceed 100%');
-                return;
-            }
-            
-            saveData();
-            updateBudgetDisplay();
-            alert('Budget plan saved successfully!');
-        }
-        
-        function updateBudgetDisplay() {
-            const container = document.getElementById('budget-summary');
-            container.innerHTML = '';
-            
-            if (budgetData.budget.income <= 0) {
-                container.innerHTML = '<p>No budget plan created yet</p>';
-                return;
-            }
-            
-            const incomeDiv = document.createElement('div');
-            incomeDiv.innerHTML = `<h4>Monthly Income: ₱${budgetData.budget.income.toFixed(2)}</h4>`;
-            container.appendChild(incomeDiv);
-            
-            const expensesHeader = document.createElement('h4');
-            expensesHeader.textContent = 'Expense Allocation:';
-            container.appendChild(expensesHeader);
-            
-            for (const category in budgetData.budget.categories) {
-                const percentage = budgetData.budget.categories[category];
-                if (percentage > 0) {
-                    const amount = (budgetData.budget.income * percentage / 100).toFixed(2);
-                    
-                    const div = document.createElement('div');
-                    div.className = 'transaction-item';
-                    div.innerHTML = `
-                        <div>
-                            <strong>${category}</strong>
-                            <span>${percentage}%</span>
-                        </div>
-                        <div class="transaction-amount">
-                            ₱${amount}
-                        </div>
-                    `;
-                    container.appendChild(div);
-                }
-            }
         }
         
         // Goals functions
@@ -973,17 +1070,13 @@
                     transactions: [],
                     budget: {
                         income: 0,
-                        categories: {
-                            Food: 0,
-                            Transportation: 0,
-                            Housing: 0,
-                            Entertainment: 0,
-                            Education: 0,
-                            Other: 0
-                        }
+                        categories: []
                     },
                     goals: []
                 };
+                
+                // Add one default category
+                addBudgetCategory();
                 
                 saveData();
                 updateDashboard();
@@ -993,9 +1086,6 @@
                 
                 // Reset form fields
                 document.getElementById('monthly-income').value = '';
-                document.querySelectorAll('.budget-percentage').forEach(input => {
-                    input.value = '';
-                });
                 document.getElementById('remaining-percentage').textContent = 'Remaining to allocate: 100%';
                 document.getElementById('remaining-percentage').style.color = 'inherit';
                 
@@ -1020,6 +1110,7 @@
                     updateTransactionHistory();
                     updateBudgetDisplay();
                     updateGoalsDisplay();
+                    populateCategoryDropdowns();
                 }
             } catch (e) {
                 console.error('Error parsing user data:', e);
